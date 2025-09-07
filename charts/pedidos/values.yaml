@@ -1,0 +1,166 @@
+# Configuración global
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# Configuración del subchart de base de datos
+db:
+  enabled: true
+
+  # Configuración de imagen PostgreSQL
+  image:
+    repository: bitnami/postgresql
+    tag: "15.5.0"
+    pullPolicy: IfNotPresent
+
+  # Credenciales de base de datos
+  auth:
+    username: pedidos
+    password: pedidospass
+    database: pedidos
+    existingSecret: "" # Usar secret existente si se especifica
+
+  # Configuración de réplicas
+  replicaCount: 1
+
+  # Configuración de persistencia
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+
+  # Configuración de recursos
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # Configuración de PostgreSQL
+  postgresql:
+    enabled: true
+    auth:
+      username: pedidos
+      password: pedidospass
+      database: pedidos
+      existingSecret: ""
+    primary:
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClass: ""
+        accessMode: ReadWriteOnce
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "250m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+    metrics:
+      enabled: false
+      serviceMonitor:
+        enabled: false
+
+# Configuración del subchart de backend
+backend:
+  enabled: true
+
+  # Configuración de imagen
+  image:
+    repository: ghcr.io/TI/k8s/pedidos-backend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  # Configuración de réplicas
+  replicaCount: 1
+
+  # Configuración de servicio
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+
+  # Configuración de Ingress
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+  hosts:
+    - host: pedidos.local
+      paths:
+        - path: /api
+          pathType: Prefix
+    tls: []
+
+  # Variables de entorno adicionales
+  env:
+    extra: []
+    # Ejemplo:
+    # - name: DEBUG
+    #   value: "true"
+    # - name: LOG_LEVEL
+    #   value: "info"
+
+  # Configuración de recursos
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+  # Configuración de autoscaling (opcional)
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  # Configuración de health checks
+  healthCheck:
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 20
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+  # Configuración de conexión a BD (se sobrescribe automáticamente)
+  database:
+    configMapName: "" # Se configura automáticamente
+
+# Configuración de red
+networkPolicy:
+  enabled: false
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: argocd
+      ports:
+        - protocol: TCP
+          port: 8000
+
+# Configuración de monitoreo
+monitoring:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    scrapeTimeout: 10s

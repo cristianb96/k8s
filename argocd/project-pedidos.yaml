@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: pedidos-project
+  namespace: argocd
+spec:
+  description: Proyecto para la aplicación de gestión de pedidos
+  sourceRepos:
+    - "https://github.com/TI/k8s.git"
+  destinations:
+    - namespace: pedidos
+      server: https://kubernetes.default.svc
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: "apps"
+      kind: Deployment
+    - group: "apps"
+      kind: StatefulSet
+    - group: "apps"
+      kind: ReplicaSet
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+    - group: "networking.k8s.io"
+      kind: Ingress
+    - group: "policy"
+      kind: PodDisruptionBudget
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: "*"
+    - group: "apps"
+      kind: "*"
+    - group: "networking.k8s.io"
+      kind: "*"
+    - group: "policy"
+      kind: "*"
+  roles:
+    - name: admin
+      description: Administrador del proyecto
+      policies:
+        - p, proj:pedidos-project:admin, applications, *, pedidos-project/*, allow
+        - p, proj:pedidos-project:admin, repositories, *, *, allow
+      groups:
+        - argocd-admins

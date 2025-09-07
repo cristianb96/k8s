@@ -1,0 +1,14 @@
+{{- if .Values.backend.enabled }}
+# ConfigMap para configuración no sensible del backend
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pedidos.fullname" . }}-backend-config
+  labels:
+    {{- include "pedidos.labels" . | nindent 4 }}
+data:
+  database.host: "{{ include "pedidos.postgresqlHost" . }}"
+  database.port: "5432"
+  database.name: "{{ .Values.db.postgresql.auth.database }}"
+  database.username: "{{ .Values.db.postgresql.auth.username }}"
+{{- end }}

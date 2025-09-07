@@ -1,0 +1,13 @@
+# Common Helm ignores
+.DS_Store
+*.swp
+*.bak
+*.tmp
+*.orig
+*.rej
+*.log
+charts
+Chart.lock
+__pycache__
+node_modules
+

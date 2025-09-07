@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pedidos
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/TI/k8s.git
+    targetRevision: HEAD
+    path: charts/pedidos
+    helm:
+      valueFiles: []
+      parameters:
+        - name: backend.image.repository
+          value: ghcr.io/TI/k8s/pedidos-backend
+        - name: backend.image.tag
+          value: "latest"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pedidos
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

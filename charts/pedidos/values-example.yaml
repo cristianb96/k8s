@@ -1,0 +1,145 @@
+# Ejemplo de configuración personalizada para el chart de pedidos
+# Copia este archivo a values.yaml y modifica según tus necesidades
+
+# Configuración global
+global:
+  imageRegistry: "ghcr.io"
+  imagePullSecrets: []
+
+# Configuración del subchart de base de datos
+db:
+  enabled: true
+
+  # Configuración de imagen PostgreSQL
+  image:
+    repository: bitnami/postgresql
+    tag: "15.5.0"
+    pullPolicy: IfNotPresent
+
+  # Credenciales de base de datos
+  auth:
+    username: pedidos
+    password: "mi-password-seguro"
+    database: pedidos
+    existingSecret: "" # Usar secret existente si se especifica
+
+  # Configuración de réplicas
+  replicaCount: 1
+
+  # Configuración de persistencia
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClass: "fast-ssd"
+    accessMode: ReadWriteOnce
+
+  # Configuración de recursos
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+# Configuración del subchart de backend
+backend:
+  enabled: true
+
+  # Configuración de imagen
+  image:
+    repository: ghcr.io/TI/k8s/pedidos-backend
+    tag: "v1.0.0"
+    pullPolicy: IfNotPresent
+
+  # Configuración de réplicas
+  replicaCount: 3
+
+  # Configuración de servicio
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+
+  # Configuración de Ingress
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: pedidos.mi-dominio.com
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: Prefix
+    tls:
+      - secretName: pedidos-tls
+        hosts:
+          - pedidos.mi-dominio.com
+
+  # Variables de entorno adicionales
+  env:
+    extra:
+      - name: DEBUG
+        value: "false"
+      - name: LOG_LEVEL
+        value: "info"
+      - name: MAX_CONNECTIONS
+        value: "100"
+
+  # Configuración de recursos
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # Configuración de autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # Configuración de health checks
+  healthCheck:
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+# Configuración de red
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: argocd
+      ports:
+        - protocol: TCP
+          port: 8000
+
+# Configuración de monitoreo
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s

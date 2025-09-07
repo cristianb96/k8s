@@ -1,0 +1,11 @@
+{{- if .Values.backend.enabled }}
+# Configuración para el subchart backend
+backend:
+  database:
+    host: {{ include "pedidos.postgresqlHost" . }}
+    port: 5432
+    name: {{ .Values.db.postgresql.auth.database }}
+    username: {{ .Values.db.postgresql.auth.username }}
+    password: {{ include "pedidos.postgresqlPassword" . }}
+    configMapName: {{ include "pedidos.fullname" . }}-backend-config
+{{- end }}

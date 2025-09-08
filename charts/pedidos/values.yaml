@@ -89,11 +89,11 @@ backend:
     enabled: false
     className: ""
     annotations: {}
-  hosts:
-    - host: pedidos.local
-      paths:
-        - path: /api
-          pathType: Prefix
+    hosts:
+      - host: pedidos.local
+        paths:
+          - path: /api
+            pathType: Prefix
     tls: []
 
   # Variables de entorno adicionales

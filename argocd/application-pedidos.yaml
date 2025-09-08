@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/TI/k8s.git
+    repoURL: https://github.com/cristianb96/k8s.git
     targetRevision: HEAD
     path: charts/pedidos
     helm:

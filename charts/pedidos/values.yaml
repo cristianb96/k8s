@@ -71,7 +71,7 @@ backend:
 
   # Configuración de imagen
   image:
-    repository: ghcr.io/TI/k8s/pedidos-backend
+    repository: ghcr.io/cristianb96/k8s/pedidos-backend
     tag: "latest"
     pullPolicy: IfNotPresent
 

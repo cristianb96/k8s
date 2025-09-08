@@ -13,7 +13,7 @@ spec:
       valueFiles: []
       parameters:
         - name: backend.image.repository
-          value: ghcr.io/TI/k8s/pedidos-backend
+          value: ghcr.io/cristianb96/k8s/pedidos-backend
         - name: backend.image.tag
           value: "latest"
   destination:

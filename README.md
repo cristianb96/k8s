@@ -19,15 +19,15 @@ Este repositorio contiene:
 
 El repositorio incluye GitHub Actions que construye y publica automáticamente la imagen en `ghcr.io`:
 
-- La imagen se publica en: `ghcr.io/TI/k8s/pedidos-backend`
+- La imagen se publica en: `ghcr.io/cristianb96/k8s/pedidos-backend`
 - Se activa en push a `main` o `develop` cuando cambian archivos en `backend/`
 
 ### Opción 2: Construcción manual
 
 ```bash
 # Desde la raíz del repo
-docker build -t ghcr.io/TI/k8s/pedidos-backend:0.1.0 -f backend/Dockerfile .
-docker push ghcr.io/TI/k8s/pedidos-backend:0.1.0
+docker build -t ghcr.io/cristianb96/k8s/pedidos-backend:0.1.0 -f backend/Dockerfile .
+docker push ghcr.io/cristianb96/k8s/pedidos-backend:0.1.0
 ```
 
 ## Despliegue con Helm (local)
@@ -43,7 +43,7 @@ helm install pedidos charts/pedidos
 
 ```bash
 helm install pedidos charts/pedidos \
-  --set backend.image.repository=ghcr.io/TI/k8s/pedidos-backend \
+  --set backend.image.repository=ghcr.io/cristianb96/k8s/pedidos-backend \
   --set backend.image.tag=v1.0.0 \
   --set backend.replicaCount=3 \
   --set db.auth.password=mi-password-seguro \
@@ -149,7 +149,7 @@ El chart principal `pedidos` contiene dos subcharts:
 # Backend
 backend:
   image:
-    repository: ghcr.io/TI/k8s/pedidos-backend
+    repository: ghcr.io/cristianb96/k8s/pedidos-backend
     tag: "latest"
     pullPolicy: IfNotPresent
 

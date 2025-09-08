@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "backend.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "backend.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "backend.fullname" . }}-db-secret
+                  key: database-url
+          envFrom:
+            - configMapRef:
+                name: {{ include "backend.fullname" . }}-config
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.healthCheck.readinessProbe.httpGet.path }}
+              port: {{ .Values.healthCheck.readinessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.healthCheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.readinessProbe.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.healthCheck.livenessProbe.httpGet.path }}
+              port: {{ .Values.healthCheck.livenessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.healthCheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.livenessProbe.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+

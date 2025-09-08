@@ -1,0 +1,75 @@
+# Configuración de imagen
+image:
+  repository: ghcr.io/cristianb96/k8s/pedidos-backend
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# Configuración de réplicas
+replicaCount: 1
+
+# Configuración de servicio
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+# Configuración de Ingress
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: pedidos.local
+      paths:
+        - path: /api
+          pathType: Prefix
+  tls: []
+
+# Variables de entorno adicionales
+env:
+  extra: []
+
+# Configuración de recursos
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+# Configuración de autoscaling (opcional)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Configuración de health checks
+healthCheck:
+  readinessProbe:
+    httpGet:
+      path: /healthz
+      port: 8000
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Configuración de base de datos
+database:
+  host: ""
+  port: 5432
+  name: "pedidos"
+  username: "pedidos"
+  password: ""
+  configMapName: ""

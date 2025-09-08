@@ -1,0 +1,6 @@
+apiVersion: v2
+name: backend
+description: Backend FastAPI para gestión de pedidos
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

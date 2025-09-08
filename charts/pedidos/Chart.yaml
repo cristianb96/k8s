@@ -7,9 +7,9 @@ appVersion: "0.1.0"
 dependencies:
   - name: db
     version: 0.1.0
-    repository: file://charts/db
+    repository: file://subcharts/db
     condition: db.enabled
   - name: backend
     version: 0.1.0
-    repository: file://charts/backend
+    repository: file://subcharts/backend
     condition: backend.enabled
